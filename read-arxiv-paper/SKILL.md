@@ -17,13 +17,13 @@ Notice the /src/ in the url. Once you have the URL:
 
 ### Part 2: Download the paper source
 
-Fetch the url to a local .tar.gz file. A good location is `~/.cache/nanochat/knowledge/{arxiv_id}.tar.gz`.
+Fetch the url to a local .tar.gz file. A good location is `~/.cache/read_arxiv_paper/knowledge/{arxiv_id}.tar.gz`.
 
 (If the file already exists, there is no need to re-download it).
 
 ### Part 3: Unpack the file in that folder
 
-Unpack the contents into `~/.cache/nanochat/knowledge/{arxiv_id}` directory.
+Unpack the contents into `~/.cache/read_arxiv_paper/knowledge/{arxiv_id}` directory.
 
 ### Part 4: Locate the entrypoint
 
@@ -46,7 +46,7 @@ Requirements:
 - Important formula rule: to avoid parsing errors, never use `<` directly in formulas; replace it with `\\lt` (for example, write `_{\\lt t}`).
 - Structure: if possible, include pseudocode at the end.
 - Markdown quality: must be Typora-compatible, complete, and well-rendered (for example, keep spaces around bold markers when needed).
-- Output file path: must save the final document as `.knowledge/{arxiv_id}/paper_reading.md` in the current directory.
+- Output file path: must save the final document as `~/.cache/read_arxiv_paper/knowledge/paper_reading.md` in the current directory.
 
 ### Part 7: IF you have access to Feishu
 If you have access to Feishu, please also send the generated `paper_reading.md` file to the feishu-docs
