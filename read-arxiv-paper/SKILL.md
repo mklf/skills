@@ -41,12 +41,13 @@ Requirements:
 
 - Output language: Chinese (professional terms may remain in English).
 - Content depth: explain the paper in detail using simple, easy-to-understand language.
-- Visuals: make it illustrated with figures from the paper; use relative paths to local image files; do not reference PDF pages; prefer png/jpeg image files.
+- Visuals: make it illustrated with figures from the paper; use relative paths to local image files; do not reference PDF pages; prefer png/jpeg image files. If host machine is missing image processing tools, just use the raw image files.
 - Formulas: ensure all formulas render correctly with KaTeX (Feishu-compatible).
 - Important formula rule: to avoid parsing errors, never use `<` directly in formulas; replace it with `\\lt` (for example, write `_{\\lt t}`).
 - Structure: if possible, include pseudocode at the end.
 - Markdown quality: must be Typora-compatible, complete, and well-rendered (for example, keep spaces around bold markers when needed).
 - Output file path: must save the final document as `~/.cache/read_arxiv_paper/knowledge/paper_reading.md` in the current directory.
 
-### Part 7: IF you have access to Feishu
+### Part 7: Send to User
 If you have access to Feishu, please also send the generated `paper_reading.md` file to the feishu-docs
+If you have access to ima skills, please upload the generated `paper_reading.md` file to the ima docs with name `{arxiv_id}.md` in proper folder.
