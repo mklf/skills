@@ -37,6 +37,12 @@ python ./scripts/manage_records.py add-issued --id 42
 
 # 3) 用户卡住/求助时立即调用此命令记录（返回 added/duplicate）
 python ./scripts/manage_records.py add-struggle --id 42
+
+# 4) 批量删除已出题记录（支持多个题号，返回已删除/未找到列表）
+python ./scripts/manage_records.py delete-issued --id 42 56 239
+
+# 5) 批量删除求助/卡壳记录（支持多个题号，返回已删除/未找到列表）
+python ./scripts/manage_records.py delete-struggle --id 42 56 239
 ```
 
 ### 数据规则

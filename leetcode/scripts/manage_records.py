@@ -66,6 +66,24 @@ def add_problem(path: Path, problem_id: int) -> bool:
     return True
 
 
+def remove_problems(path: Path, problem_ids: List[int]) -> List[int]:
+    """Delete the given ids from a record file.
+
+    Returns the list of ids that were actually present and removed.
+    """
+    data = _load(path)
+    targets = set(problem_ids)
+    removed = [
+        item.get("id") for item in data["problems"] if item.get("id") in targets
+    ]
+    if removed:
+        data["problems"] = [
+            item for item in data["problems"] if item.get("id") not in targets
+        ]
+        _save(path, data)
+    return removed
+
+
 def cmd_exists(args: argparse.Namespace) -> None:
     ids = list(dict.fromkeys(args.id))
     issued = []
@@ -93,6 +111,27 @@ def cmd_add_struggle(args: argparse.Namespace) -> None:
     print("added" if created else "duplicate")
 
 
+def _report_removed(removed: List[int], requested: List[int]) -> None:
+    requested_unique = list(dict.fromkeys(requested))
+    removed_set = set(removed)
+    not_found = [i for i in requested_unique if i not in removed_set]
+
+    removed_text = "、".join(str(i) for i in removed) if removed else "无"
+    not_found_text = "、".join(str(i) for i in not_found) if not_found else "无"
+    print(f"已删除: {removed_text}")
+    print(f"未找到: {not_found_text}")
+
+
+def cmd_delete_issued(args: argparse.Namespace) -> None:
+    removed = remove_problems(ISSUED_PATH, args.id)
+    _report_removed(removed, args.id)
+
+
+def cmd_delete_struggle(args: argparse.Namespace) -> None:
+    removed = remove_problems(STRUGGLE_PATH, args.id)
+    _report_removed(removed, args.id)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Manage LeetCode skill record files.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -118,6 +157,30 @@ def build_parser() -> argparse.ArgumentParser:
         "--id", type=int, required=True, help="LeetCode problem id"
     )
     p_add_struggle.set_defaults(func=cmd_add_struggle)
+
+    p_del_issued = sub.add_parser(
+        "delete-issued", help="Delete one or more issued problem records."
+    )
+    p_del_issued.add_argument(
+        "--id",
+        type=int,
+        nargs="+",
+        required=True,
+        help="One or more LeetCode problem ids",
+    )
+    p_del_issued.set_defaults(func=cmd_delete_issued)
+
+    p_del_struggle = sub.add_parser(
+        "delete-struggle", help="Delete one or more struggle/help records."
+    )
+    p_del_struggle.add_argument(
+        "--id",
+        type=int,
+        nargs="+",
+        required=True,
+        help="One or more LeetCode problem ids",
+    )
+    p_del_struggle.set_defaults(func=cmd_delete_struggle)
 
     return parser
 
