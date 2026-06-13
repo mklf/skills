@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path.home() / ".leetcode_records"
 ISSUED_PATH = BASE_DIR / "leetcode.json"
 STRUGGLE_PATH = BASE_DIR / "leetcode_struggle.json"
 
@@ -45,6 +45,9 @@ def _save(path: Path, data: Dict[str, List[Dict[str, Any]]]) -> None:
 
 
 def init_files() -> None:
+    # Ensure the base directory exists under the user's home
+    BASE_DIR.mkdir(parents=True, exist_ok=True)
+
     for path in (ISSUED_PATH, STRUGGLE_PATH):
         if not path.exists():
             _save(path, _empty_payload())
@@ -73,9 +76,11 @@ def remove_problems(path: Path, problem_ids: List[int]) -> List[int]:
     """
     data = _load(path)
     targets = set(problem_ids)
-    removed = [
-        item.get("id") for item in data["problems"] if item.get("id") in targets
-    ]
+    removed = []
+    for item in data["problems"]:
+        id_val = item.get("id")
+        if isinstance(id_val, int) and id_val in targets:
+            removed.append(id_val)
     if removed:
         data["problems"] = [
             item for item in data["problems"] if item.get("id") not in targets
