@@ -49,5 +49,4 @@ Requirements:
 - Output file path: must save the final document as `~/.cache/read_arxiv_paper/knowledge/paper_reading.md` in the current directory.
 
 ### Part 7: Send to User
-If you have access to Feishu, please also send the generated `paper_reading.md` file to the feishu-docs
-If you have access to ima skills, please upload the generated `paper_reading.md` file to the ima docs with name `{arxiv_id}.md` in proper folder.
+If you have access to document tools, for exmaple in Feishu, please also send the generated `paper_reading.md` file to the feishu-docs. If you don't have access to document tools, send the content of `paper_reading.md` directly to the user in the chat.
