@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -44,6 +45,19 @@ def _save(path: Path, data: Dict[str, List[Dict[str, Any]]]) -> None:
     )
 
 
+def _today() -> str:
+    return date.today().isoformat()
+
+
+def _days_since(added_at: str | None) -> int | None:
+    if not added_at:
+        return None
+    try:
+        return (date.today() - datetime.fromisoformat(added_at).date()).days
+    except ValueError:
+        return None
+
+
 def init_files() -> None:
     for path in (ISSUED_PATH, STRUGGLE_PATH):
         if not path.exists():
@@ -60,8 +74,7 @@ def add_problem(path: Path, problem_id: int) -> bool:
     if any(item.get("id") == problem_id for item in data["problems"]):
         return False
 
-    item = {"id": problem_id}
-    data["problems"].append(item)
+    data["problems"].append({"id": problem_id, "added_at": _today()})
     _save(path, data)
     return True
 
@@ -132,6 +145,30 @@ def cmd_delete_struggle(args: argparse.Namespace) -> None:
     _report_removed(removed, args.id)
 
 
+def cmd_review(args: argparse.Namespace) -> None:
+    data = _load(STRUGGLE_PATH)
+    problems = data["problems"]
+    if not problems:
+        print("暂无需要复习的题目")
+        return
+
+    rows = []
+    for item in problems:
+        problem_id = item.get("id")
+        added_at = item.get("added_at")
+        days = _days_since(added_at)
+        rows.append((problem_id, added_at or "未知", days))
+
+    # Sort by days descending (longest waiting first)
+    rows.sort(key=lambda r: r[2] if r[2] is not None else -1, reverse=True)
+
+    print(f"{'题号':<8} {'添加日期':<12} 距今天数")
+    print("-" * 32)
+    for problem_id, added_at, days in rows:
+        days_text = f"{days} 天" if days is not None else "未知"
+        print(f"{problem_id:<8} {added_at:<12} {days_text}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Manage LeetCode skill record files.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -181,6 +218,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="One or more LeetCode problem ids",
     )
     p_del_struggle.set_defaults(func=cmd_delete_struggle)
+
+    sub.add_parser(
+        "review", help="List struggle problems with days since added."
+    ).set_defaults(func=cmd_review)
 
     return parser
 
