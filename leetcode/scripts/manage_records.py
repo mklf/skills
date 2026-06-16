@@ -36,6 +36,11 @@ def _load(path: Path) -> Dict[str, List[Dict[str, Any]]]:
         or not isinstance(data["problems"], list)
     ):
         return _empty_payload()
+    today = _today()
+    if any("added_at" not in item for item in data["problems"]):
+        for item in data["problems"]:
+            item.setdefault("added_at", today)
+        _save(path, data)
     return data
 
 
