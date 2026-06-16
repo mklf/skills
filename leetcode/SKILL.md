@@ -29,30 +29,46 @@ argument-hint: '例如：给我一道可练的 LeetCode 题；我卡住了；再
 优先使用脚本维护记录：`./scripts/manage_records.py`
 
 ```bash
-# 1) 出题前检查是否重复（会静默自动初始化记录文件，支持多个题号，返回自然语言结果）
+# 1) 出题前检查是否重复（支持多个题号）
 python ./scripts/manage_records.py exists --id 42 56 239
 
-# 2) 出题后立即调用此命令记录已出题（返回 added/duplicate）
-python ./scripts/manage_records.py add-issued --id 42
+# 2) 出题后立即记录（--name 可选，建议填写便于后续复习）
+python ./scripts/manage_records.py add-issued --id 42 --name "接雨水"
 
-# 3) 用户卡住/求助时立即调用此命令记录（返回 added/duplicate）
-python ./scripts/manage_records.py add-struggle --id 42
+# 3) 用户卡住/求助时立即记录
+python ./scripts/manage_records.py add-struggle --id 42 --name "接雨水"
 
-# 4) 批量删除已出题记录（支持多个题号，返回已删除/未找到列表）
+# 4) 查看需要复习的题目及等待天数（按时间降序；--min-days 只看等待超过 N 天的）
+python ./scripts/manage_records.py review
+python ./scripts/manage_records.py review --min-days 3
+
+# 5) 用户已掌握某题，从复习队列移出
+python ./scripts/manage_records.py mark-mastered --id 42 56
+
+# 6) 查看所有已出题记录
+python ./scripts/manage_records.py list-issued
+
+# 7) 练习数据统计（出题数、卡壳率、掌握率等）
+python ./scripts/manage_records.py stats
+
+# 8) 批量删除已出题记录
 python ./scripts/manage_records.py delete-issued --id 42 56 239
 
-# 5) 批量删除求助/卡壳记录（支持多个题号，返回已删除/未找到列表）
+# 9) 批量删除求助/卡壳记录
 python ./scripts/manage_records.py delete-struggle --id 42 56 239
-
-# 6) 查看需要复习的题目及添加天数（按等待时间从长到短排列）
-python ./scripts/manage_records.py review
 ```
 
 ### 数据规则
 1. 若文件不存在，先创建。
 2. 每次新出题前先调用 `python ./scripts/manage_records.py exists --id <题号1> <题号2> ...` 检查是否重复；除非用户明确要求，否则不要重复出题。
-3. 每次成功出题后，必须立刻调用 `python ./scripts/manage_records.py add-issued --id <题号>`，不得延迟到后续轮次。
-4. 一旦用户在该题的首次作答中出现错误，或用户明确表示“不会/没思路”，必须立刻调用 `python ./scripts/manage_records.py add-struggle --id <题号>`（避免重复追加）。
+3. 每次成功出题后，必须立刻调用以下命令，不得延迟到后续轮次：
+   ```bash
+   python ./scripts/manage_records.py add-issued --id <题号> --name “<题名>”
+   ```
+4. 一旦用户在该题的首次作答中出现错误，或用户明确表示”不会/没思路”，必须立刻调用（避免重复追加）：
+   ```bash
+   python ./scripts/manage_records.py add-struggle --id <题号> --name “<题名>”
+   ```
 ## 交互流程
 
 ### 1) 出题阶段（用户说要练习时）
@@ -67,7 +83,7 @@ python ./scripts/manage_records.py review
 在题目与代码框架完整输出后，立即执行：
 
 ```bash
-python ./scripts/manage_records.py add-issued --id <题号>
+python ./scripts/manage_records.py add-issued --id <题号> --name "<题名>"
 ```
 
 必须给出 Python 3 代码框架：
@@ -101,16 +117,16 @@ if __name__ == "__main__":
 先立即执行：
 
 ```bash
-python ./scripts/manage_records.py add-struggle --id <题号>
+python ./scripts/manage_records.py add-struggle --id <题号> --name “<题名>”
 ```
 
-只给“提示 1”（方向级别），不要给实现细节。
+只给”提示 1”（方向级别），不要给实现细节。
 给完后立即反问：让用户说下一步打算。
 
 补充：如果用户第一次提交答案就是错误结果（例如样例不通过、输出不匹配、明显逻辑错误），也按同样规则立即调用：
 
 ```bash
-python ./scripts/manage_records.py add-struggle --id <题号>
+python ./scripts/manage_records.py add-struggle --id <题号> --name "<题名>"
 ```
 
 ### 3) 用户继续卡壳
